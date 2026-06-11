@@ -1,122 +1,156 @@
+:root {
+    --bg-main: #12011a;
+    --chat-bg: #1d072b;
+    --kuromi-black: #080808;
+    --kuromi-purple: #9b5de5;
+    --kuromi-pink: #ff007f;
+    --text-color: #f3e8ff;
+}
+
+/* Tema Preto e Branco (Caso ela escolha mudar a estética) */
+.monochrome-theme {
+    --bg-main: #121212 !important;
+    --chat-bg: #1e1e1e !important;
+    --kuromi-black: #000000 !important;
+    --kuromi-purple: #666666 !important;
+    --kuromi-pink: #ffffff !important;
+    --text-color: #e0e0e0 !important;
+}
+
 body {
-    background-color: #000;
+    background-color: var(--bg-main);
+    color: var(--text-color);
+    font-family: 'Courier New', Courier, monospace;
     margin: 0;
-    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    color: #fff;
-    font-family: 'Courier New', Courier, monospace;
-    overflow: hidden; /* Impede rolagem na página */
-}
-
-#game-container {
-    position: relative;
-    width: 100%;
-    max-width: 320px; /* Largura base para mobile clássico */
-    height: 100%;
-    max-height: 568px; /* Altura base */
-    display: flex;
-    flex-direction: column;
     overflow: hidden;
-    border: 2px solid #333;
+    transition: background 0.5s ease;
 }
 
-canvas {
-    background-color: #050505;
+#chat-container {
     width: 100%;
-    height: auto; /* Mantém a proporção do canvas */
-    display: block;
-}
-
-/* Caixa de Diálogo */
-#dialogue-box {
-    position: absolute;
-    bottom: 160px; /* Espaço para os controles */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    background: rgba(0, 0, 0, 0.9);
-    border: 3px solid #fff;
-    border-radius: 4px;
-    padding: 10px;
-    color: #fff;
-    z-index: 10;
-    box-sizing: border-box;
-    image-rendering: pixelated; /* Mantém o estilo pixel art */
-}
-
-#dialogue-speaker {
-    font-weight: bold;
-    color: #ff4757;
-    margin-bottom: 4px;
-    display: block;
-}
-
-#dialogue-text {
-    font-size: 14px;
-    margin: 0 0 10px 0;
-}
-
-#dialogue-next {
-    background: #fff;
-    color: #000;
-    border: none;
-    padding: 4px 8px;
-    font-family: inherit;
-    cursor: pointer;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* Controles Mobile (Vibe Retro) */
-#mobile-controls {
+    max-width: 400px;
+    height: 90vh;
+    background-color: var(--chat-bg);
+    border: 3px solid var(--kuromi-black);
+    border-radius: 12px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-    background-color: #1a1a1a;
-    height: 150px;
+    box-shadow: 0px 0px 20px var(--kuromi-purple);
+    position: relative;
+    transition: all 0.3s ease;
 }
 
-.middle-row {
+.chat-header {
+    background-color: var(--kuromi-black);
+    padding: 12px;
+    font-weight: bold;
+    color: var(--kuromi-pink);
+    border-bottom: 2px solid var(--kuromi-purple);
     display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-dot { color: #00ff00; animation: blink 1.5s infinite; }
+
+.chat-body {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
     gap: 15px;
 }
 
-.control-btn {
-    width: 45px;
-    height: 45px;
-    border: 3px solid #fff;
-    border-radius: 50%;
-    background: #333;
+/* Balões de Mensagem */
+.msg {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.msg.kuromi {
+    background-color: var(--kuromi-black);
+    color: var(--text-color);
+    border: 1px solid var(--kuromi-purple);
+    align-self: flex-start;
+}
+
+.msg.user {
+    background-color: var(--kuromi-pink);
     color: #fff;
-    font-size: 20px;
-    font-weight: bold;
-    font-family: inherit;
+    align-self: flex-end;
+}
+
+.chat-footer {
+    padding: 15px;
+    background-color: var(--kuromi-black);
+    border-top: 2px solid var(--kuromi-purple);
+}
+
+#options-container {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
     justify-content: center;
-    touch-action: manipulation; /* Evita zoom no double-tap */
-    margin: 4px;
 }
 
-#btn-action {
-    background: #ff4757;
-    width: 50px;
-    height: 50px;
+button {
+    background-color: var(--chat-bg);
+    color: var(--text-color);
+    border: 2px solid var(--kuromi-purple);
+    padding: 10px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    transition: all 0.2s;
 }
 
-/* Evita seleção de texto nos botões */
-.control-btn {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+button:hover {
+    background-color: var(--kuromi-pink);
+    color: #fff;
+    border-color: var(--kuromi-black);
 }
+
+/* Animação de Tremer com Força */
+.shake {
+    animation: shakeAnim 0.15s cubic-bezier(.36,.07,.19,.97) both infinite;
+}
+
+@keyframes shakeAnim {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    10%, 30%, 50%, 70%, 90% { transform: translate3d(-8px, 4px, 0); }
+    20%, 40%, 60%, 80% { transform: translate3d(8px, -4px, 0); }
+}
+
+/* Efeito de Flash de Luz ao Consertar a Tela */
+.flash-light {
+    animation: flashAnim 0.5s ease-out;
+}
+@keyframes flashAnim {
+    0% { filter: brightness(5); }
+    100% { filter: brightness(1); }
+}
+
+/* Tela de Rachadura */
+#crack-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: url('https://i.imgur.com/7S872fW.png') no-repeat center;
+    background-size: cover;
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* Esconder elementos */
+.hidden { display: none !important; }
+
+@keyframes blink { 50% { opacity: 0; } }
