@@ -2,31 +2,29 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nosso Universo Pixel 2D ❤️</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuromi Chat Especial 🖤</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="game-container">
-        <canvas id="gameCanvas" width="320" height="400"></canvas>
-        
-        <div id="dialogue-box" class="hidden">
-            <span id="dialogue-speaker">Kleiton:</span>
-            <p id="dialogue-text">Olá! Você me encontrou no escuro...</p>
-            <button id="dialogue-next">Próximo</button>
+    <div id="crack-overlay" class="hidden"></div>
+
+    <div id="chat-container" class="kuromi-theme">
+        <div class="chat-header">
+            <span class="status-dot">●</span>
+            <span id="header-title">Kuromi_Love_Chat.exe</span>
         </div>
 
-        <div id="mobile-controls">
-            <button class="control-btn" id="btn-up">↑</button>
-            <div class="middle-row">
-                <button class="control-btn" id="btn-left">←</button>
-                <button class="control-btn" id="btn-action">A</button> <button class="control-btn" id="btn-right">→</button>
+        <div class="chat-body" id="chat-body">
             </div>
-            <button class="control-btn" id="btn-down">↓</button>
+
+        <div class="chat-footer">
+            <div id="options-container">
+                </div>
         </div>
     </div>
 
     <script src="script.js"></script>
 </body>
-    </html>
+</html>
