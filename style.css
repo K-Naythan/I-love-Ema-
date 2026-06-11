@@ -6,49 +6,117 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    overflow: hidden;
-    font-family: 'Courier New', Courier, monospace; /* Dá um ar retro */
+    color: #fff;
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden; /* Impede rolagem na página */
 }
 
 #game-container {
     position: relative;
-    border: 4px solid #333;
+    width: 100%;
+    max-width: 320px; /* Largura base para mobile clássico */
+    height: 100%;
+    max-height: 568px; /* Altura base */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 2px solid #333;
 }
 
 canvas {
-    background-color: #050505; /* Quase preto absoluto */
+    background-color: #050505;
+    width: 100%;
+    height: auto; /* Mantém a proporção do canvas */
     display: block;
 }
 
-/* Caixa de Diálogo do RPG */
+/* Caixa de Diálogo */
 #dialogue-box {
     position: absolute;
-    bottom: 20px;
+    bottom: 160px; /* Espaço para os controles */
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.9);
     border: 3px solid #fff;
-    border-radius: 5px;
-    padding: 15px;
+    border-radius: 4px;
+    padding: 10px;
     color: #fff;
+    z-index: 10;
     box-sizing: border-box;
+    image-rendering: pixelated; /* Mantém o estilo pixel art */
 }
 
 #dialogue-speaker {
     font-weight: bold;
     color: #ff4757;
-    font-size: 18px;
+    margin-bottom: 4px;
     display: block;
-    margin-bottom: 5px;
 }
 
 #dialogue-text {
-    font-size: 16px;
-    line-height: 1.4;
+    font-size: 14px;
     margin: 0 0 10px 0;
+}
+
+#dialogue-next {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 4px 8px;
+    font-family: inherit;
+    cursor: pointer;
 }
 
 .hidden {
     display: none !important;
+}
+
+/* Controles Mobile (Vibe Retro) */
+#mobile-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    background-color: #1a1a1a;
+    height: 150px;
+}
+
+.middle-row {
+    display: flex;
+    gap: 15px;
+}
+
+.control-btn {
+    width: 45px;
+    height: 45px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: #333;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation; /* Evita zoom no double-tap */
+    margin: 4px;
+}
+
+#btn-action {
+    background: #ff4757;
+    width: 50px;
+    height: 50px;
+}
+
+/* Evita seleção de texto nos botões */
+.control-btn {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
