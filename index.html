@@ -2,22 +2,31 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nosso Universo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nosso Universo Pixel 2D ❤️</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div id="game-container">
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <canvas id="gameCanvas" width="320" height="400"></canvas>
         
         <div id="dialogue-box" class="hidden">
             <span id="dialogue-speaker">Kleiton:</span>
-            <p id="dialogue-text">Olá! Que bom que você me encontrou no escuro...</p>
-            <div id="dialogue-options"></div>
+            <p id="dialogue-text">Olá! Você me encontrou no escuro...</p>
+            <button id="dialogue-next">Próximo</button>
+        </div>
+
+        <div id="mobile-controls">
+            <button class="control-btn" id="btn-up">↑</button>
+            <div class="middle-row">
+                <button class="control-btn" id="btn-left">←</button>
+                <button class="control-btn" id="btn-action">A</button> <button class="control-btn" id="btn-right">→</button>
+            </div>
+            <button class="control-btn" id="btn-down">↓</button>
         </div>
     </div>
 
     <script src="script.js"></script>
 </body>
-  </html>
+    </html>
