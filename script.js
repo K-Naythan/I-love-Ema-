@@ -1,182 +1,140 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const dialogueBox = document.getElementById('dialogue-box');
-const dialogueSpeaker = document.getElementById('dialogue-speaker');
-const dialogueText = document.getElementById('dialogue-text');
-const dialogueNext = document.getElementById('dialogue-next');
+const chatBody = document.getElementById('chat-body');
+const optionsContainer = document.getElementById('options-container');
+const chatContainer = document.getElementById('chat-container');
+const crackOverlay = document.getElementById('crack-overlay');
 
-// Configurações do Jogo
-const grid = 16; // Tamanho base da pixel art
-const scale = 3; // Escala para os sprites
-const sprSize = grid * scale; // Tamanho desenhado
+let naoClickCount = 0;
+let mudouEstetica = false;
 
-// Carregar Imagens
-const spriteSheet = new Image();
-spriteSheet.src = 'assets/minhas_poses.png'; // <- Verifique se o caminho e nome estão certos
+// Banco de dados de perguntas principais salvas para restaurar depois
+function carregarPerguntasIniciais() {
+    clearOptions();
+    addOption("Por que está com a estética da Kuromi?", () => rotaKuromi());
+    addOption("Me conte mais sobre você...", () => rotaSobreMim());
+    addOption("Me conte uma história sua", () => rotaHistoriaSua());
+}
 
-let assetsLoaded = false;
-spriteSheet.onload = () => { assetsLoaded = true; };
+// Funções Auxiliares de Interface
+function addMessage(text, sender = 'kuromi') {
+    const msg = document.createElement('div');
+    msg.classList.add('msg', sender);
+    msg.innerText = text;
+    chatBody.appendChild(msg);
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
 
-// Mapa Simples (0 = chão, 1 = parede)
-const map = [
-    [1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,1,0,0,0,0,1], // Uma parede no meio (objeto)
-    [1,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,0,0,0,0,1],
-    [1,0,0,0,0,1,0,0,0,1],
-    [1,1,1,1,1,1,1,1,1,1]
-];
+function clearOptions() {
+    optionsContainer.innerHTML = '';
+}
 
-// Posições (multiplicadas por grid e scale)
-// O Personagem "Ela" (que ela controla)
-const player = {
-    x: 2 * grid * scale,
-    y: 7 * grid * scale,
-    spr: { x: 0, y: 0 }, // Pose Parada
-    speed: 3
-};
+function addOption(text, callback, customStyle = null) {
+    const btn = document.createElement('button');
+    btn.innerText = text;
+    btn.addEventListener('click', callback);
+    if(customStyle) Object.assign(btn.style, customStyle);
+    optionsContainer.appendChild(btn);
+    return btn;
+}
 
-// O Personagem "Você" (estático)
-const target = {
-    x: 5 * grid * scale,
-    y: 2 * grid * scale,
-    spr: { x: 0, y: 0 }, // Pose Parada inicial
-    talking Spr: { x: grid * 2, y: 0 } // Pose Falando (terceiro sprite na folha)
-};
+// --- FASE 1: Tela Inicial ---
+function telaInicial() {
+    addMessage("Oi amor, seja bem vinda ao meu site dedicado especialmente para você! 🖤");
+    addOption("OK", () => segundaTela());
+}
 
-// Sistema de Diálogo
-let dialogueIndex = 0;
-const dialogues = [
-    "Olá! Que bom que você me encontrou no escuro...",
-    "Eu criei esse pequeno mundo pixelado só pra você.",
-    "Esse personagem sou eu, te esperando.",
-    "Aperte o botão 'A' perto das coisas para descobrir mais sobre mim.",
-    "Eu te amo! ❤️"
-];
+// --- FASE 2: Introdução e Teste do Sim/Não ---
+function segundaTela() {
+    addMessage("Aqui é onde você pode saber um pouco mais de mim, então vamos começar?");
+    naoClickCount = 0;
+    mostrarBotoesSimNao();
+}
 
-let inDialogue = false;
-let nearTarget = false;
+function mostrarBotoesSimNao() {
+    clearOptions();
+    addOption("Sim", () => cliqueiSim());
+    
+    // Gerar o botão Não que muda de posição ou quebra a tela
+    const btnNao = addOption("Não", () => cliqueiNao());
+    
+    if (naoClickCount > 0) {
+        // Deixa o botão em um lugar aleatório flutuante caso ela já tenha falhado
+        btnNao.style.position = 'absolute';
+        btnNao.style.left = Math.random() * 70 + 10 + '%';
+        btnNao.style.top = Math.random() * 70 + 10 + '%';
+    }
+}
 
-// Função principal de desenho
-function draw() {
-    if (!assetsLoaded) {
-        requestAnimationFrame(draw);
-        return;
+function cliqueiNao() {
+    naoClickCount++;
+    
+    if (naoClickCount === 1) {
+        chatContainer.classList.add('shake');
+        addMessage("⚠️ Ei! Não vale recusar! Tente de novo...");
+        setTimeout(() => chatContainer.classList.remove('shake'), 1000);
+        mostrarBotoesSimNao();
+    } 
+    else if (naoClickCount === 2) {
+        chatContainer.classList.add('shake');
+        crackOverlay.classList.remove('hidden'); // Ativa a rachadura visual
+        addMessage("💥 VOCÊ QUASE QUEBROU O SISTEMA! Última chance...");
+        setTimeout(() => chatContainer.classList.remove('shake'), 1000);
+        mostrarBotoesSimNao();
+    } 
+    else if (naoClickCount >= 3) {
+        clearOptions();
+        chatBody.innerHTML = '';
+        document.body.style.backgroundColor = '#000';
+        chatContainer.innerHTML = `<div style="padding:50px; text-align:center; color:red; font-size:24px; font-weight:bold;">SISTEMA BLOQUEADO: VOCÊ FOI BANIDA DO MEU CORAÇÃO 🔒</div>`;
+    }
+}
+
+function cliqueiSim() {
+    if (naoClickCount >= 2) {
+        // Animação de consertar a tela com flash de luz
+        chatContainer.classList.add('flash-light');
+        crackOverlay.classList.add('hidden');
+        setTimeout(() => chatContainer.classList.remove('flash-light'), 500);
+    }
+    addMessage("Perfeito! Vamos entrar nas perguntas. O que quer saber?");
+    carregarPerguntasIniciais();
+}
+
+// --- FASE 3: Rotas das Perguntas Principais ---
+
+// PERGUNTA 1: Estética da Kuromi
+function rotaKuromi() {
+    addMessage("É porque me veio à cabeça de repente... gostaria de mudar?");
+    clearOptions();
+    addOption("Sim", () => {
+        mudouEstetica = true;
+        chatContainer.classList.add('monochrome-theme');
+        addMessage("Estética alterada para Preto e Branco. Prosseguindo...");
+        carregarPerguntasIniciais();
+    });
+    addOption("Não", () => {
+        addMessage("Beleza, mantendo o estilo Kuromi ativo!");
+        carregarPerguntasIniciais();
+    });
+}
+
+// PERGUNTA 2: Me conte uma história sua (Braço Fraturado)
+function rotaHistoriaSua() {
+    // Se a estética mudou, ela não exibe animações da Kuromi
+    if (!mudouEstetica) {
+        addMessage("💬 [Kuromi senta para te explicar uma coisa muito importante...]");
     }
     
-    // Limpar Canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Desenhar o Mapa/Chão (simples)
-    ctx.fillStyle = "#111"; // Chão bem escuro
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Desenhar "Você" (Personagem Fixo)
-    ctx.drawImage(
-        spriteSheet, 
-        (inDialogue ? target.talkingSpr.x : target.spr.x), target.spr.y, // Origem
-        grid, grid, // Tamanho na origem
-        target.x, target.y, // Destino
-        sprSize, sprSize // Tamanho no destino
-    );
-
-    // Desenhar "Ela" (Personagem dela, usando a pose 'andando' da folha como exemplo de variação)
-    ctx.drawImage(
-        spriteSheet, 
-        grid, 0, // Pose 'Andando' (segundo sprite na folha)
-        grid, grid,
-        player.x, player.y,
-        sprSize, sprSize
-    );
-
-    // --- Efeito de Lanterna/Escuridão ---
-    ctx.save();
-    ctx.fillStyle = "rgba(0,0,0,1)"; // Escuridão Total
+    addMessage("Eu antes não era alguém tão seco assim. Quando criança eu era cheio de energia e teve um dia que eu já fraturei o meu braço. Quando cheguei em casa, minha mãe arregalou os olhos e esteve em choque. Nesse dia ela teve que procurar por hospitais a pé para me tratarem e eu sinceramente me senti mal, pois eu nunca quis dar trabalho aos outros por coisas descuidadas que eu fiz. Nesse dia senti que deveria ter cuidado para que as pessoas não possam ter trabalho.");
     
-    // Cria o círculo de luz ao redor DELA
-    ctx.beginPath();
-    ctx.rect(0, 0, canvas.width, canvas.height); // Preenche a tela
-    ctx.arc(
-        player.x + sprSize / 2, // Centro da luz X
-        player.y + sprSize / 2, // Centro da luz Y
-        80, // Raio da lanterna
-        0, Math.PI * 2, true // Inverte o caminho para cortar o círculo
-    );
-    ctx.fill();
-    ctx.restore();
-
-    // Checar Proximidade
-    const dist = Math.sqrt(Math.pow((player.x - target.x), 2) + Math.pow((player.y - target.y), 2));
-    nearTarget = (dist < sprSize * 1.5); // Ativa se estiver perto
-
-    requestAnimationFrame(draw);
+    carregarPerguntasIniciais();
 }
 
-// Movimentação
-function movePlayer(dx, dy) {
-    if (inDialogue) return; // Impede andar se estiver falando
-
-    // Pose 'andando' padrão
-    player.x += dx * player.speed;
-    player.y += dy * player.speed;
-
-    // Limites Simples do Canvas
-    player.x = Math.max(0, Math.min(canvas.width - sprSize, player.x));
-    player.y = Math.max(0, Math.min(canvas.height - sprSize, player.y));
+// PERGUNTA 3: Me conte mais sobre você (Desabafo sobre Abuso Emocional)
+function rotaSobreMim() {
+    addMessage("Eu já sofri de abuso emocional e sinceramente eu me distancio de pessoas que chegam a falar coisas de mau gosto e optam por atacar a minha vontade de sentir o que posso, como raiva, ou até mesmo mostrar que me senti ofendido, e levam como se eu estivesse errado e que levo tudo a sério. Para mim isso é covardia.");
+    
+    carregarPerguntasIniciais();
 }
 
-// Interação
-function interact() {
-    if (nearTarget && !inDialogue) {
-        startDialogue();
-    } else if (inDialogue) {
-        nextDialogue();
-    }
-}
-
-function startDialogue() {
-    inDialogue = true;
-    dialogueIndex = 0;
-    dialogueSpeaker.innerText = "Kleiton:";
-    dialogueText.innerText = dialogues[dialogueIndex];
-    dialogueBox.classList.remove('hidden');
-}
-
-function nextDialogue() {
-    dialogueIndex++;
-    if (dialogueIndex < dialogues.length) {
-        dialogueText.innerText = dialogues[dialogueIndex];
-    } else {
-        closeDialogue();
-    }
-}
-
-function closeDialogue() {
-    inDialogue = false;
-    dialogueBox.classList.add('hidden');
-}
-
-// --- Controles ---
-
-// Controles Mobile
-document.getElementById('btn-up').addEventListener('touchstart', (e) => { e.preventDefault(); movePlayer(0, -5); });
-document.getElementById('btn-down').addEventListener('touchstart', (e) => { e.preventDefault(); movePlayer(0, 5); });
-document.getElementById('btn-left').addEventListener('touchstart', (e) => { e.preventDefault(); movePlayer(-5, 0); });
-document.getElementById('btn-right').addEventListener('touchstart', (e) => { e.preventDefault(); movePlayer(5, 0); });
-document.getElementById('btn-action').addEventListener('touchstart', (e) => { e.preventDefault(); interact(); });
-dialogueNext.addEventListener('click', nextDialogue);
-
-// Controles de Teclado (para teste no PC)
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowUp' || e.key === 'w') movePlayer(0, -5);
-    if (e.key === 'ArrowDown' || e.key === 's') movePlayer(0, 5);
-    if (e.key === 'ArrowLeft' || e.key === 'a') movePlayer(-5, 0);
-    if (e.key === 'ArrowRight' || e.key === 'd') movePlayer(5, 0);
-    if (e.key === 'e' || e.key === 'Enter') interact();
-});
-
-// Iniciar
-draw();
+// Inicializar o chat
+telaInicial();
